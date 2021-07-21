@@ -12,7 +12,7 @@
   <a href="https://github.com/thepushkarp/rupee-inflation" target="_blank" rel="noopener noreferrer">
     Rupee Inflation Dashboard
   </a>
-  Made with ❤️ by
+  made with ❤️ by
   <a href="https://github.com/thepushkarp">
     Pushkar  Patel
   </a>
