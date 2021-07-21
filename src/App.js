@@ -52,6 +52,8 @@ class App extends React.Component {
           title: {
             text: 'Value',
           },
+          min: 0,
+          max: 100,
         },
         dataLabels: {
           enabled: false,
