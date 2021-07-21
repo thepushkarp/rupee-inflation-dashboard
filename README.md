@@ -15,7 +15,7 @@
 <img alt="Inflation Chart" src="rupeexinflationxchart.png">
 
 <p align="center">
-  <a href="https://github.com/thepushkarp/rupee-inflation" target="_blank" rel="noopener noreferrer">
+  <a href="https://github.com/thepushkarp/rupee-inflation-dashboard" target="_blank" rel="noopener noreferrer">
     Rupee Inflation Dashboard
   </a>
   made with ❤️ by

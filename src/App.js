@@ -56,15 +56,6 @@ class App extends React.Component {
         dataLabels: {
           enabled: false,
         },
-        fill: {
-          opacity: 0.9,
-          type: 'image',
-          image: {
-            src: ['./assets/hundred.png'],
-            width: 852,
-            height: 396,
-          },
-        },
       },
       series: [
         {
@@ -77,7 +68,7 @@ class App extends React.Component {
     };
 
     return (
-      <Container className="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+      <Container className="cover-container d-flex w-100 h-100 p-3 flex-column">
         <Nav className="mb-3">
           <h1 className="mb-0">Rupee Inflation Dashboard</h1>
         </Nav>
@@ -135,8 +126,7 @@ class App extends React.Component {
             options={chartOptions.options}
             series={chartOptions.series}
             type="area"
-            width={852}
-            height={396}
+            className="chart"
           />
         </main>
 
@@ -153,7 +143,7 @@ class App extends React.Component {
           </small>
           <div>
             <a
-              href="https://github.com/thepushkarp/rupee-inflation"
+              href="https://github.com/thepushkarp/rupee-inflation-dashboard"
               target="_blank"
               rel="noopener noreferrer"
             >
