@@ -55,6 +55,125 @@ class App extends React.Component {
           min: 0,
           max: 100,
         },
+        annotations: {
+          points: [
+            {
+              x: '2020',
+              y: String(
+                (100 * 100 * inflationData[0].amount) /
+                  inflationData[59].amount /
+                  amounts[this.state.startYearIndex]
+              ),
+              marker: {
+                size: 6,
+                fillColor: '#fff',
+                strokeColor: '#2698FF',
+                radius: 2,
+              },
+              label: {
+                borderColor: '#FF4560',
+                offsetY: 40,
+                style: {
+                  color: '#fff',
+                  background: '#FF4560',
+                },
+                text: 'COVID-19',
+              },
+            },
+            {
+              x: '2016',
+              y: String(
+                (100 * 100 * inflationData[0].amount) /
+                  inflationData[55].amount /
+                  amounts[this.state.startYearIndex]
+              ),
+              marker: {
+                size: 6,
+                fillColor: '#fff',
+                strokeColor: '#2698FF',
+                radius: 2,
+              },
+              label: {
+                borderColor: '#FF4560',
+                offsetY: 0,
+                style: {
+                  color: '#fff',
+                  background: '#FF4560',
+                },
+                text: 'GST and Demonetisation',
+              },
+            },
+            {
+              x: '2015',
+              y: String(
+                (100 * 100 * inflationData[0].amount) /
+                  inflationData[54].amount /
+                  amounts[this.state.startYearIndex]
+              ),
+              marker: {
+                size: 6,
+                fillColor: '#fff',
+                strokeColor: '#2698FF',
+                radius: 2,
+              },
+              label: {
+                borderColor: '#FF4560',
+                offsetY: 40,
+                style: {
+                  color: '#fff',
+                  background: '#FF4560',
+                },
+                text: 'FDI',
+              },
+            },
+            {
+              x: '1971',
+              y: String(
+                (100 * 100 * inflationData[0].amount) /
+                  inflationData[10].amount /
+                  amounts[this.state.startYearIndex]
+              ),
+              marker: {
+                size: 6,
+                fillColor: '#fff',
+                strokeColor: '#2698FF',
+                radius: 2,
+              },
+              label: {
+                borderColor: '#FF4560',
+                offsetY: 40,
+                style: {
+                  color: '#fff',
+                  background: '#FF4560',
+                },
+                text: 'Economic Liberalisation',
+              },
+            },
+            {
+              x: '1969',
+              y: String(
+                (100 * 100 * inflationData[0].amount) /
+                  inflationData[8].amount /
+                  amounts[this.state.startYearIndex]
+              ),
+              marker: {
+                size: 6,
+                fillColor: '#fff',
+                strokeColor: '#2698FF',
+                radius: 2,
+              },
+              label: {
+                borderColor: '#FF4560',
+                offsetY: 0,
+                style: {
+                  color: '#fff',
+                  background: '#FF4560',
+                },
+                text: 'Nationalisation of banks',
+              },
+            },
+          ],
+        },
         dataLabels: {
           enabled: false,
         },
