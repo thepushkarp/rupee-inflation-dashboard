@@ -259,7 +259,15 @@ class App extends React.Component {
               target="_blank"
               rel="noopener noreferrer"
             >
-              India Inflation Calculator: World Bank data, 1961-2021 (INR)
+              [1]
+            </a>{' '}
+            and{' '}
+            <a
+              href="https://www.timesnownews.com/india/article/8-big-indian-economic-reforms-that-changed-status-quo/51923"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              [2]
             </a>
           </small>
           <div>
@@ -270,6 +278,7 @@ class App extends React.Component {
             >
               Rupee Inflation Dashboard
             </a>
+
             {` created by `}
             <a
               href="https://thepushkarp.com"
