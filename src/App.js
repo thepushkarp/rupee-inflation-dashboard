@@ -259,15 +259,7 @@ class App extends React.Component {
               target="_blank"
               rel="noopener noreferrer"
             >
-              [1]
-            </a>{' '}
-            and{' '}
-            <a
-              href="https://www.timesnownews.com/india/article/8-big-indian-economic-reforms-that-changed-status-quo/51923"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              [2]
+              India Inflation Data
             </a>
           </small>
           <div>
