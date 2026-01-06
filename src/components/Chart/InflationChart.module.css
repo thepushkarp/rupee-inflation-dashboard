@@ -15,6 +15,11 @@
   z-index: 1;
 }
 
+/* Ensure ApexCharts has transparent background to show canvas beneath */
+.chartContainer :global(.apexcharts-canvas) {
+  background: transparent !important;
+}
+
 @media (min-width: 768px) {
   .chartWrapper {
     height: 420px;

@@ -89,7 +89,6 @@ export function createChartOptions(
       zoom: { enabled: false },
       animations: {
         enabled: true,
-        easing: 'easeinout',
         speed: 400,
       },
       fontFamily: 'DM Sans, sans-serif',

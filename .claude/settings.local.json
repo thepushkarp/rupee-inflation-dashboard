@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(yarn start)",
+      "Bash(git add:*)",
+      "Bash(git reset:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(yarn typecheck:*)"
+    ]
+  }
+}
