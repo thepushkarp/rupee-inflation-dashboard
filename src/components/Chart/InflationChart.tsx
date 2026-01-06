@@ -1,9 +1,8 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import Chart from 'react-apexcharts';
 import { InflationDataPoint } from '../../types/inflation';
 import { historicalEvents } from '../../data/historicalEvents';
 import { createChartOptions, createChartSeries } from './chartConfig';
-import { RupeeBackground } from './RupeeBackground';
 import styles from './InflationChart.module.css';
 
 interface InflationChartProps {
@@ -12,8 +11,6 @@ interface InflationChartProps {
 }
 
 export function InflationChart({ data, isDarkMode }: InflationChartProps) {
-  const chartContainerRef = useRef<HTMLDivElement>(null);
-
   const chartOptions = useMemo(
     () => createChartOptions(data, historicalEvents, isDarkMode),
     [data, isDarkMode]
@@ -26,8 +23,7 @@ export function InflationChart({ data, isDarkMode }: InflationChartProps) {
   }
 
   return (
-    <div className={styles.chartWrapper} ref={chartContainerRef}>
-      <RupeeBackground data={data} chartRef={chartContainerRef} />
+    <div className={styles.chartWrapper}>
       <div className={styles.chartContainer}>
         <Chart
           options={chartOptions}
