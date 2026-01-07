@@ -11,6 +11,12 @@ interface InflationChartProps {
 }
 
 export function InflationChart({ data, isDarkMode }: InflationChartProps) {
+  // Generate a stable key from the data range to force remount on year change
+  const chartKey = useMemo(() => {
+    if (data.length === 0) return 'empty';
+    return `chart-${data[0].year}-${data[data.length - 1].year}`;
+  }, [data]);
+
   const chartOptions = useMemo(
     () => createChartOptions(data, historicalEvents, isDarkMode),
     [data, isDarkMode]
@@ -24,15 +30,14 @@ export function InflationChart({ data, isDarkMode }: InflationChartProps) {
 
   return (
     <div className={styles.chartWrapper}>
-      <div className={styles.chartContainer}>
-        <Chart
-          options={chartOptions}
-          series={chartSeries}
-          type="area"
-          height="100%"
-          width="100%"
-        />
-      </div>
+      <Chart
+        key={chartKey}
+        options={chartOptions}
+        series={chartSeries}
+        type="area"
+        height="100%"
+        width="100%"
+      />
     </div>
   );
 }
