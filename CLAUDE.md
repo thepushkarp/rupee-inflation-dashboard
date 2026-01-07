@@ -4,7 +4,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Project Overview
 
-A React dashboard visualizing the declining purchasing power of ₹100 (Indian Rupee) from 1960 to present, with historical economic event annotations. Uses live data from the World Bank API. Features a canvas-based rupee note background that appears below the inflation line, showing how much value has eroded.
+A React dashboard visualizing the declining purchasing power of ₹100 (Indian Rupee) from 1960 to present, with historical economic event annotations. Uses live data from the World Bank API.
 
 ## Development Commands
 
@@ -27,14 +27,13 @@ yarn typecheck    # Type check without emitting
 1. `useInflationData` hook calls World Bank API via `inflationApi.ts`
 2. SWR handles caching, revalidation, and error states
 3. Data flows to `InflationChart` component with memoized calculations
-4. `RupeeCanvas` draws ₹100 note image masked by the inflation line
 
 ### Key Directories
 
 ```
 src/
 ├── components/
-│   ├── Chart/           # InflationChart, RupeeCanvas, chartConfig
+│   ├── Chart/           # InflationChart, chartConfig
 │   ├── Controls/        # YearRangeSelector
 │   ├── Layout/          # Header, Footer
 │   └── ui/              # LoadingState, ErrorState
@@ -43,8 +42,6 @@ src/
 │   └── useTheme.ts           # Dark mode management
 ├── services/
 │   └── inflationApi.ts       # World Bank API integration
-├── assets/
-│   └── hundred.png           # ₹100 note image
 ├── data/
 │   └── historicalEvents.ts   # Event annotations config
 ├── types/
@@ -62,8 +59,7 @@ src/
 | `src/App.tsx` | Main component, state management, layout |
 | `src/services/inflationApi.ts` | World Bank API fetcher |
 | `src/components/Chart/chartConfig.ts` | ApexCharts configuration |
-| `src/components/Chart/RupeeCanvas.tsx` | Canvas-based rupee note background |
-| `src/components/Chart/InflationChart.tsx` | Chart with integrated canvas |
+| `src/components/Chart/InflationChart.tsx` | Chart component with key prop for re-renders |
 | `src/data/historicalEvents.ts` | Event annotations (year-based lookup) |
 | `vite.config.ts` | Vite build configuration |
 
