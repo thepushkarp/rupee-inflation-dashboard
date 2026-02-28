@@ -1,5 +1,9 @@
 @import './variables.css';
 
+:root {
+  color-scheme: dark light;
+}
+
 *,
 *::before,
 *::after {
@@ -19,11 +23,17 @@ body {
   font-family: var(--font-sans);
   font-weight: 400;
   background-color: var(--color-bg);
+  background-image:
+    linear-gradient(to right, var(--color-bg-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-bg-grid) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+  background-attachment: fixed;
   color: var(--color-text);
   line-height: 1.6;
   min-height: 100vh;
-  transition: background-color var(--duration) var(--ease),
-              color var(--duration) var(--ease);
+  transition:
+    background-color var(--duration) var(--ease),
+    color var(--duration) var(--ease);
 }
 
 #root {
@@ -33,7 +43,9 @@ body {
 }
 
 /* Typography */
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-weight: 600;
   line-height: 1.3;
   letter-spacing: -0.02em;
@@ -46,22 +58,37 @@ p {
 a {
   color: var(--color-text);
   text-decoration: underline;
-  text-underline-offset: 2px;
-  transition: opacity var(--duration) var(--ease);
+  text-decoration-color: var(--color-text-muted);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition:
+    color var(--duration) var(--ease),
+    text-decoration-color var(--duration) var(--ease);
 }
 
 a:hover {
-  opacity: 0.7;
+  text-decoration-color: var(--color-accent);
 }
 
 /* Focus */
 :focus-visible {
   outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
 /* Selection */
 ::selection {
   background-color: var(--color-accent);
   color: white;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

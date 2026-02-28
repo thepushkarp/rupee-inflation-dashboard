@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
-import { inflationFetcher } from '../services/inflationApi';
-import { InflationDataPoint, YearRange } from '../types/inflation';
+import { inflationFetcher } from '@services/inflationApi';
+import type { InflationDataPoint, YearRange } from '@/types/inflation';
 
 const CACHE_KEY = 'india-inflation-data';
 
@@ -10,6 +11,7 @@ interface UseInflationDataResult {
   isLoading: boolean;
   error: Error | undefined;
   yearRange: { min: number; max: number } | null;
+  lastUpdated: number | null;
 }
 
 /**
@@ -28,6 +30,13 @@ export function useInflationData(range?: YearRange): UseInflationDataResult {
     }
   );
 
+  const [lastUpdated, setLastUpdated] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!data) return;
+    setLastUpdated(Date.now());
+  }, [data]);
+
   // Calculate available year range from data
   const yearRange = data
     ? {
@@ -40,7 +49,7 @@ export function useInflationData(range?: YearRange): UseInflationDataResult {
   const filteredData =
     data && range
       ? data.filter((d) => d.year >= range.startYear && d.year <= range.endYear)
-      : data ?? [];
+      : (data ?? []);
 
   return {
     data,
@@ -48,5 +57,6 @@ export function useInflationData(range?: YearRange): UseInflationDataResult {
     isLoading,
     error,
     yearRange,
+    lastUpdated,
   };
 }

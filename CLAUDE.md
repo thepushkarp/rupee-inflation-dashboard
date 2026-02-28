@@ -9,13 +9,17 @@ A React dashboard visualizing the declining purchasing power of ₹100 (Indian R
 ## Development Commands
 
 ```bash
-yarn install      # Install dependencies
-yarn dev          # Start Vite dev server on port 3000
-yarn build        # Production build (outputs to /build)
-yarn preview      # Preview production build locally
-yarn format       # Format code with Prettier
-yarn lint         # Lint TypeScript files
-yarn typecheck    # Type check without emitting
+bun install            # Install dependencies (writes bun.lock)
+bun run dev            # Start Vite dev server on port 3000
+bun run check          # Format + lint + css types + typecheck + test + build
+bun run build          # Production build (outputs to /build)
+bun run preview        # Preview production build locally
+bun run format         # Format code with oxfmt
+bun run lint           # Lint TypeScript/TSX with oxlint
+bun run test           # Run Vitest
+bun run typecheck      # Type check without emitting
+bun run css:types      # (Re)generate CSS Module typings
+bun run css:types:check # Verify CSS Module typings are up to date
 ```
 
 ## Architecture
@@ -34,8 +38,10 @@ yarn typecheck    # Type check without emitting
 src/
 ├── components/
 │   ├── Chart/           # InflationChart, chartConfig
-│   ├── Controls/        # YearRangeSelector
-│   ├── Layout/          # Header, Footer
+│   ├── Controls/        # YearRangeSelector + RangePresets
+│   ├── Events/          # EventsLedger
+│   ├── Kpi/             # KpiStrip
+│   ├── Layout/          # TopBar, Footer
 │   └── ui/              # LoadingState, ErrorState
 ├── hooks/
 │   ├── useInflationData.ts   # Data fetching with SWR
@@ -54,18 +60,19 @@ src/
 
 ### Key Files
 
-| File | Purpose |
-|------|---------|
-| `src/App.tsx` | Main component, state management, layout |
-| `src/services/inflationApi.ts` | World Bank API fetcher |
-| `src/components/Chart/chartConfig.ts` | ApexCharts configuration |
+| File                                      | Purpose                                      |
+| ----------------------------------------- | -------------------------------------------- |
+| `src/App.tsx`                             | Main component, state management, layout     |
+| `src/services/inflationApi.ts`            | World Bank API fetcher                       |
+| `src/components/Chart/chartConfig.ts`     | ApexCharts configuration                     |
 | `src/components/Chart/InflationChart.tsx` | Chart component with key prop for re-renders |
-| `src/data/historicalEvents.ts` | Event annotations (year-based lookup) |
-| `vite.config.ts` | Vite build configuration |
+| `src/data/historicalEvents.ts`            | Event annotations (year-based lookup)        |
+| `vite.config.ts`                          | Vite build configuration                     |
 
 ### Historical Event Annotations
 
 Events are defined by year (not index) in `historicalEvents.ts`:
+
 - 1969: Bank Nationalisation
 - 1971: Economic Liberalisation
 - 1991: LPG Reforms
@@ -81,7 +88,7 @@ To add new events, add to the `historicalEvents` array with `year`, `label`, `de
 
 - No authentication required
 - Returns CPI data indexed to 2010 = 100
-- Coverage: 1960-present (annual data)
+- Coverage: 1960-present (annual data; request range uses current year)
 
 ### Theming
 
@@ -93,10 +100,12 @@ Uses CSS custom properties in `variables.css`. Dark mode is automatic based on s
 
 ## Tech Stack
 
-- React 18.3 with functional components
-- TypeScript 5.6 with strict mode
-- Vite 6 for build tooling
+- React 19 with functional components
+- TypeScript 5.9 with strict mode
+- Vite 7 for build tooling
 - SWR for data fetching
-- ApexCharts 4 for charting
+- ApexCharts 5 for charting
 - CSS Modules for component styling
-- Prettier for formatting
+- oxfmt for formatting
+- oxlint for linting
+- Vitest + Testing Library for tests

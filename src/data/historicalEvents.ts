@@ -1,4 +1,4 @@
-import { HistoricalEvent } from '../types/inflation';
+import type { HistoricalEvent } from '@/types/inflation';
 
 /**
  * Historical events to annotate on the inflation chart.

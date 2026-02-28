@@ -3,7 +3,8 @@
 <h1 align="center">Rupee Inflation Dashboard</h1>
 
 <p align="center">
-  <a href="https://github.com/thepushkarp/rupee-inflation-dashboard/"><img alt="CodeQL Status" src="https://img.shields.io/github/actions/workflow/status/thepushkarp/rupee-inflation-dashboard/codeql.yml?logo=GitHub&label=CodeQL&style=for-the-badge"></a>
+  <a href="https://github.com/thepushkarp/rupee-inflation-dashboard/"><img alt="CI Status" src="https://img.shields.io/github/actions/workflow/status/thepushkarp/rupee-inflation-dashboard/ci.yml?logo=GitHub&label=CI&style=for-the-badge"></a>
+  <a href="https://github.com/thepushkarp/rupee-inflation-dashboard/"><img alt="CodeQL Status" src="https://img.shields.io/github/actions/workflow/status/thepushkarp/rupee-inflation-dashboard/codeql-analysis.yml?logo=GitHub&label=CodeQL&style=for-the-badge"></a>
   <a href="https://github.com/thepushkarp/rupee-inflation-dashboard/stargazers"><img alt="Stargazers" src="https://img.shields.io/github/stars/thepushkarp/rupee-inflation-dashboard?style=for-the-badge"></a>
   <a href="https://github.com/thepushkarp/rupee-inflation-dashboard/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/thepushkarp/rupee-inflation-dashboard?style=for-the-badge"></a>
 </p>
@@ -19,24 +20,27 @@
 - **Live Data**: Fetches real-time inflation data from [World Bank Open Data](https://data.worldbank.org/indicator/FP.CPI.TOTL?locations=IN)
 - **Interactive Chart**: Filter data by year range with responsive ApexCharts visualization
 - **Historical Events**: Annotated markers for significant economic events (Bank Nationalisation, LPG Reforms, Demonetisation, COVID-19, etc.)
-- **Dark Mode**: Automatic theme switching based on system preference
+- **Theme Toggle**: Dark/light with system default and a manual override
 - **Responsive Design**: Mobile-first CSS with modern design patterns
 - **TypeScript**: Full type safety throughout the codebase
 
 ## Tech Stack
 
-- **React 18** with functional components and hooks
-- **TypeScript** for type safety
+- **React 19** + **Vite 7** SPA
+- **Bun** for installs, scripts, and the canonical lockfile (`bun.lock`)
+- **TypeScript 5.9** (strict)
 - **SWR** for data fetching with caching
 - **ApexCharts** for interactive charting
-- **CSS Modules** with CSS custom properties for theming
+- **CSS Modules** + CSS custom properties for theming
+- **oxlint** + **oxfmt** for fast lint/format
+- **Vitest** + Testing Library for tests
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+
-- Yarn
+- Bun 1.3.10
+- Node.js 22.12+
 
 ### Installation
 
@@ -46,10 +50,10 @@ git clone https://github.com/thepushkarp/rupee-inflation-dashboard.git
 cd rupee-inflation-dashboard
 
 # Install dependencies
-yarn install
+bun install
 
 # Start development server
-yarn start
+bun run dev
 ```
 
 The app will be available at [http://localhost:3000](http://localhost:3000)
@@ -57,12 +61,15 @@ The app will be available at [http://localhost:3000](http://localhost:3000)
 ### Available Scripts
 
 ```bash
-yarn start      # Start development server
-yarn build      # Create production build
-yarn test       # Run tests
-yarn format     # Format code with Prettier
-yarn lint       # Lint TypeScript files
-yarn typecheck  # Run TypeScript type checking
+bun run dev            # Start Vite dev server
+bun run check          # Format + lint + css types + typecheck + test + build
+bun run build          # Production build (outputs to /build)
+bun run test           # Run tests
+bun run format         # Auto-format the repo
+bun run lint           # Lint TypeScript/TSX
+bun run typecheck      # Type check without emitting
+bun run css:types      # (Re)generate CSS Module typings
+bun run css:types:check # Verify CSS Module typings are up to date
 ```
 
 ## Data Source
@@ -78,8 +85,10 @@ This dashboard uses the **World Bank Open Data API** to fetch Consumer Price Ind
 src/
 ├── components/
 │   ├── Chart/           # Chart components with SVG background effect
-│   ├── Controls/        # Year range selector
-│   ├── Layout/          # Header and footer
+│   ├── Controls/        # Year range selector + presets
+│   ├── Events/          # Historical events ledger
+│   ├── Kpi/             # KPI strip
+│   ├── Layout/          # TopBar + footer
 │   └── ui/              # Reusable UI components
 ├── hooks/               # Custom React hooks
 ├── services/            # API integration

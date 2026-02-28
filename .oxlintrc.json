@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["import", "typescript", "unicorn"],
+  "env": {
+    "browser": true
+  },
+  "rules": {
+    "eslint/no-unused-vars": "error",
+    "eslint/no-undef": "error"
+  }
+}
