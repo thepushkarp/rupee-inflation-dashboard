@@ -1,27 +1,33 @@
-/* Minimal Professional Design System */
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+/* Finance-terminal design tokens */
 
 :root {
-  /* Colors - Refined Neutral Palette */
-  --color-bg: #fafafa;
+  /* Colors (light) */
+  --color-bg: #f8fafc;
   --color-bg-elevated: #ffffff;
-  --color-bg-subtle: #f5f5f5;
+  --color-bg-subtle: #f1f5f9;
+  --color-bg-overlay: rgba(248, 250, 252, 0.78);
 
-  --color-text: #171717;
-  --color-text-secondary: #525252;
-  --color-text-muted: #a3a3a3;
+  --color-text: #0b0f14;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748b;
 
-  --color-border: #e5e5e5;
-  --color-border-subtle: #f0f0f0;
+  --color-border: #cbd5e1;
+  --color-border-subtle: #e2e8f0;
 
-  /* Accent - Single muted blue */
   --color-accent: #2563eb;
-  --color-accent-muted: rgba(37, 99, 235, 0.08);
+  --color-accent-muted: rgba(37, 99, 235, 0.12);
+  --color-accent-contrast: #ffffff;
+  --color-danger: #ef4444;
+  --color-success: #16a34a;
 
   /* Chart */
-  --color-chart-line: #1d4ed8;
-  --color-chart-area: rgba(37, 99, 235, 0.06);
-  --color-annotation: #dc2626;
+  --color-chart-line: var(--color-accent);
+  --color-chart-area: rgba(37, 99, 235, 0.08);
+  --color-annotation: var(--color-danger);
+
+  /* Background texture */
+  --grid-size: 44px;
+  --color-bg-grid: rgba(15, 23, 42, 0.06);
 
   /* Spacing - Generous */
   --space-1: 4px;
@@ -56,31 +62,38 @@
   --text-4xl: 2.5rem;
   --text-5xl: 3rem;
 
-  /* Shadows - Very subtle */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(2, 6, 23, 0.08);
+  --shadow-md: 0 12px 30px rgba(2, 6, 23, 0.12);
+  --shadow-panel: 0 24px 80px rgba(2, 6, 23, 0.16);
 
   /* Transitions */
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
   --duration: 200ms;
 }
 
-/* Dark Mode - Clean contrast */
+/* Dark Mode */
 [data-theme='dark'] {
-  --color-bg: #0a0a0a;
-  --color-bg-elevated: #171717;
-  --color-bg-subtle: #1c1c1c;
+  --color-bg: #070b12;
+  --color-bg-elevated: #0c111b;
+  --color-bg-subtle: #101827;
+  --color-bg-overlay: rgba(7, 11, 18, 0.76);
 
-  --color-text: #fafafa;
-  --color-text-secondary: #a3a3a3;
-  --color-text-muted: #525252;
+  --color-text: #e6e9ef;
+  --color-text-secondary: #b7c0cc;
+  --color-text-muted: #7b8798;
 
-  --color-border: #262626;
-  --color-border-subtle: #1f1f1f;
+  --color-border: #1b2638;
+  --color-border-subtle: #132033;
 
-  --color-accent-muted: rgba(37, 99, 235, 0.15);
-  --color-chart-area: rgba(37, 99, 235, 0.1);
+  --color-accent: #38bdf8;
+  --color-accent-muted: rgba(56, 189, 248, 0.16);
+  --color-accent-contrast: #04121d;
+  --color-chart-area: rgba(56, 189, 248, 0.11);
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --color-bg-grid: rgba(226, 232, 240, 0.05);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.34);
+  --shadow-md: 0 14px 34px rgba(0, 0, 0, 0.45);
+  --shadow-panel: 0 28px 90px rgba(0, 0, 0, 0.58);
 }

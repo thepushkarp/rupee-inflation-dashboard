@@ -9,73 +9,70 @@
   padding: var(--space-8) var(--space-4) var(--space-16);
 }
 
-.container {
-  max-width: 900px;
+.shell {
+  max-width: 1160px;
   margin: 0 auto;
-}
-
-.controls {
-  margin-bottom: var(--space-8);
-}
-
-.chart {
-  margin-bottom: var(--space-10);
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: var(--space-6);
-  padding: var(--space-8);
-  background: var(--color-bg-elevated);
+}
+
+.panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.chartColumn {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.ledgerColumn {
+  min-width: 0;
+}
+
+.controlsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding: var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
+  background: var(--color-bg-elevated);
+  box-shadow: var(--shadow-sm);
 }
 
-.stat {
-  text-align: center;
-}
-
-.statValue {
-  display: block;
-  font-size: var(--text-3xl);
-  font-weight: 600;
-  color: var(--color-text);
+.summary {
+  font-size: var(--text-xs);
   font-family: var(--font-mono);
-  letter-spacing: -0.03em;
-}
-
-.statLabel {
-  display: block;
-  margin-top: var(--space-2);
-  font-size: var(--text-sm);
   color: var(--color-text-muted);
   line-height: 1.5;
 }
 
-@media (max-width: 640px) {
-  .stats {
+@media (max-width: 1024px) {
+  .panel {
     grid-template-columns: 1fr;
-    gap: var(--space-6);
-    padding: var(--space-6);
   }
 
-  .stat {
-    padding: var(--space-3) 0;
-    border-bottom: 1px solid var(--color-border-subtle);
+  .ledgerColumn {
+    display: none;
   }
+}
 
-  .stat:last-child {
-    border-bottom: none;
+@media (max-width: 640px) {
+  .controlsRow {
+    padding: var(--space-3);
   }
 }
 
 @media (min-width: 768px) {
   .main {
     padding: var(--space-10) var(--space-8) var(--space-20);
-  }
-
-  .statValue {
-    font-size: var(--text-4xl);
   }
 }

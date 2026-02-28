@@ -1,4 +1,4 @@
-import { InflationDataPoint, WorldBankDataPoint } from '../types/inflation';
+import type { InflationDataPoint, WorldBankDataPoint } from '@/types/inflation';
 
 const WORLD_BANK_API = 'https://api.worldbank.org/v2';
 const INDIA_CODE = 'IN';
@@ -9,7 +9,8 @@ const CPI_INDICATOR = 'FP.CPI.TOTL'; // Consumer Price Index (2010 = 100)
  * CPI is indexed to 2010 = 100, so we calculate purchasing power relative to 1960.
  */
 export async function fetchInflationData(): Promise<InflationDataPoint[]> {
-  const url = `${WORLD_BANK_API}/country/${INDIA_CODE}/indicator/${CPI_INDICATOR}?format=json&per_page=100&date=1960:2024`;
+  const currentYear = new Date().getFullYear();
+  const url = `${WORLD_BANK_API}/country/${INDIA_CODE}/indicator/${CPI_INDICATOR}?format=json&per_page=100&date=1960:${currentYear}`;
 
   const response = await fetch(url);
   if (!response.ok) {
@@ -28,19 +29,22 @@ export async function fetchInflationData(): Promise<InflationDataPoint[]> {
   // Filter out null values and sort by year ascending
   const validData = rawData
     .filter((d) => d.value !== null)
-    .sort((a, b) => parseInt(a.date) - parseInt(b.date));
+    .sort((a, b) => Number.parseInt(a.date, 10) - Number.parseInt(b.date, 10));
 
   if (validData.length === 0) {
     throw new Error('No valid inflation data points');
   }
 
   // Get base CPI (earliest year in our data)
-  const baseCPI = validData[0].value!;
+  const baseCPI = validData.at(0)?.value;
+  if (baseCPI === undefined || baseCPI === null) {
+    throw new Error('No valid inflation data points');
+  }
 
   // Transform to our data structure
   const inflationData: InflationDataPoint[] = validData.map((d, index) => {
     const currentCPI = d.value!;
-    const year = parseInt(d.date);
+    const year = Number.parseInt(d.date, 10);
 
     // Purchasing power: What ₹100 from base year can buy today
     // If CPI doubled, ₹100 can only buy what ₹50 could before
@@ -49,8 +53,10 @@ export async function fetchInflationData(): Promise<InflationDataPoint[]> {
     // Inflation rate (year-over-year change)
     let inflationRate = 0;
     if (index > 0) {
-      const prevCPI = validData[index - 1].value!;
-      inflationRate = ((currentCPI - prevCPI) / prevCPI) * 100;
+      const prevCPI = validData.at(index - 1)?.value;
+      if (prevCPI !== undefined && prevCPI !== null) {
+        inflationRate = ((currentCPI - prevCPI) / prevCPI) * 100;
+      }
     }
 
     return {

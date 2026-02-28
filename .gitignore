@@ -21,3 +21,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Keep CSS Modules tracked even if a global gitignore matches "*.mod*".
+!*.module.css
+!*.module.css.d.ts

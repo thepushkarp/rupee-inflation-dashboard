@@ -1,18 +1,21 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const currentDir = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@components': path.resolve(__dirname, './src/components'),
-      '@hooks': path.resolve(__dirname, './src/hooks'),
-      '@services': path.resolve(__dirname, './src/services'),
-      '@types': path.resolve(__dirname, './src/types'),
-      '@styles': path.resolve(__dirname, './src/styles'),
-      '@data': path.resolve(__dirname, './src/data'),
+      '@': resolve(currentDir, './src'),
+      '@components': resolve(currentDir, './src/components'),
+      '@hooks': resolve(currentDir, './src/hooks'),
+      '@services': resolve(currentDir, './src/services'),
+      '@styles': resolve(currentDir, './src/styles'),
+      '@data': resolve(currentDir, './src/data'),
     },
   },
   server: {
@@ -22,5 +25,11 @@ export default defineConfig({
   build: {
     outDir: 'build',
     sourcemap: true,
+  },
+  test: {
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
+    clearMocks: true,
+    restoreMocks: true,
   },
 });
