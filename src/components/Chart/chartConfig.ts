@@ -179,7 +179,7 @@ export function createChartOptions(
             background: ${background};
             color: ${fg};
             box-shadow: 0 10px 30px rgba(0,0,0,0.18);
-            font-family: DM Sans, system-ui, sans-serif;
+            font-family: var(--font-sans);
           ">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
               <div style="font-size:12px;font-weight:650;letter-spacing:-0.02em;">${year ?? ''}</div>
