@@ -21,19 +21,6 @@ export function Footer() {
 
         <a
           className={styles.footerItem}
-          href="https://github.com/thepushkarp/rupee-inflation-dashboard"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Source
-        </a>
-
-        <span className={styles.footerSep} aria-hidden="true">
-          •
-        </span>
-
-        <a
-          className={styles.footerItem}
           href="https://thepushkarp.com"
           target="_blank"
           rel="noopener noreferrer"
