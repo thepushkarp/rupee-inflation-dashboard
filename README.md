@@ -1,108 +1,64 @@
-<p align="center"><img alt="Rupee Inflation Dashboard" src="public/logo512.png" width="200"></p>
+# Rupee Inflation
 
-<h1 align="center">Rupee Inflation Dashboard</h1>
+An interactive chart of the purchasing power of ₹100 in India, using annual World Bank CPI observations.
 
-<p align="center">
-  <a href="https://github.com/thepushkarp/rupee-inflation-dashboard/"><img alt="CI Status" src="https://img.shields.io/github/actions/workflow/status/thepushkarp/rupee-inflation-dashboard/ci.yml?logo=GitHub&label=CI&style=for-the-badge"></a>
-  <a href="https://github.com/thepushkarp/rupee-inflation-dashboard/"><img alt="CodeQL Status" src="https://img.shields.io/github/actions/workflow/status/thepushkarp/rupee-inflation-dashboard/codeql-analysis.yml?logo=GitHub&label=CodeQL&style=for-the-badge"></a>
-  <a href="https://github.com/thepushkarp/rupee-inflation-dashboard/stargazers"><img alt="Stargazers" src="https://img.shields.io/github/stars/thepushkarp/rupee-inflation-dashboard?style=for-the-badge"></a>
-  <a href="https://github.com/thepushkarp/rupee-inflation-dashboard/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/thepushkarp/rupee-inflation-dashboard?style=for-the-badge"></a>
-</p>
+## Development
 
-<p align="center">
-  Interactive dashboard visualizing the declining purchasing power of ₹100 over the decades
-</p>
+Requires Bun 1.3.10+ and Node.js 22.12+.
 
----
-
-## Features
-
-- **Live Data**: Fetches real-time inflation data from [World Bank Open Data](https://data.worldbank.org/indicator/FP.CPI.TOTL?locations=IN)
-- **Interactive Chart**: Filter data by year range with responsive ApexCharts visualization
-- **Historical Events**: Annotated markers for significant economic events (Bank Nationalisation, LPG Reforms, Demonetisation, COVID-19, etc.)
-- **Theme Toggle**: Dark/light with system default and a manual override
-- **Responsive Design**: Mobile-first CSS with modern design patterns
-- **TypeScript**: Full type safety throughout the codebase
-
-## Tech Stack
-
-- **React 19** + **Vite 7** SPA
-- **Bun** for installs, scripts, and the canonical lockfile (`bun.lock`)
-- **TypeScript 5.9** (strict)
-- **SWR** for data fetching with caching
-- **ApexCharts** for interactive charting
-- **CSS Modules** + CSS custom properties for theming
-- **oxlint** + **oxfmt** for fast lint/format
-- **Vitest** + Testing Library for tests
-
-## Getting Started
-
-### Prerequisites
-
-- Bun 1.3.10
-- Node.js 22.12+
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/thepushkarp/rupee-inflation-dashboard.git
-cd rupee-inflation-dashboard
-
-# Install dependencies
-bun install
-
-# Start development server
+```sh
+bun install --frozen-lockfile
 bun run dev
+bun --bun run check
 ```
 
-The app will be available at [http://localhost:3000](http://localhost:3000)
+The development server uses port 3000. Production output goes to `build/`.
+The check command runs formatting, lint, CSS Module typing, TypeScript, tests, and the production build.
+`--bun` runs the tooling with Bun, avoiding the typed-css-modules/yargs incompatibility with Node 26.
 
-### Available Scripts
+## Data and calculations
 
-```bash
-bun run dev            # Start Vite dev server
-bun run check          # Format + lint + css types + typecheck + test + build
-bun run build          # Production build (outputs to /build)
-bun run test           # Run tests
-bun run format         # Auto-format the repo
-bun run lint           # Lint TypeScript/TSX
-bun run typecheck      # Type check without emitting
-bun run css:types      # (Re)generate CSS Module typings
-bun run css:types:check # Verify CSS Module typings are up to date
-```
+The browser requests all available annual observations from 1960 through the current calendar year for [World Bank indicator FP.CPI.TOTL](https://data.worldbank.org/indicator/FP.CPI.TOTL?locations=IN).
+Null observations are omitted; unpublished years are never estimated. Invalid CPI values fail the request.
 
-## Data Source
+Purchasing power for year Y is `100 × CPI(selected start year) / CPI(Y)`.
+The chart and endpoint use this ratio directly; only displayed values are rounded.
+Annual inflation is the CPI percentage change from the preceding calendar year, or unavailable when that observation is missing.
 
-This dashboard uses the **World Bank Open Data API** to fetch Consumer Price Index (CPI) data for India. The CPI indicator (`FP.CPI.TOTL`) provides annual inflation data from 1960 onwards.
+SWR refreshes on initial load, focus, reconnect, and every six hours while the page is visible and online.
+Requests are deduplicated for one minute. Full history includes newly published years automatically; a custom range stays selected.
+A failed background refresh retains the last successful data and offers Retry. An initial failure shows an error.
 
-- [World Bank API Documentation](https://datahelpdesk.worldbank.org/knowledgebase/articles/889392-about-the-indicators-api-documentation)
-- [India CPI Data](https://data.worldbank.org/indicator/FP.CPI.TOTL?locations=IN)
+“Annual CPI through” identifies the latest observation year. “Last checked” records the successful fetch time.
+The World Bank dataset update date, when provided, appears in the timestamp’s title.
 
-## Project Structure
+## Chart and events
 
-```
-src/
-├── components/
-│   ├── Chart/           # Chart components with SVG background effect
-│   ├── Controls/        # Year range selector + presets
-│   ├── Events/          # Historical events ledger
-│   ├── Kpi/             # KPI strip
-│   ├── Layout/          # TopBar + footer
-│   └── ui/              # Reusable UI components
-├── hooks/               # Custom React hooks
-├── services/            # API integration
-├── styles/              # Global CSS and variables
-├── types/               # TypeScript type definitions
-└── data/                # Static data and event annotations
-```
+The interface uses a single light theme. Start/end selectors and Full history control the chart.
+ApexCharts renders the annual line and event annotations without animation.
+A single local banknote image is clipped using the rendered area path in the same SVG coordinate system.
+It preserves its proportions and crops to cover the plot. Render callbacks and resize observation keep the mask and HTML event targets aligned.
+
+Event points show sourced historical context on hover or focus. Click/tap pins the details; Escape, Close, or clicking outside dismisses them.
+Left/right arrow keys move between points, and Tab enters the open details. Previous/Next in the popup makes tightly spaced events reachable on touch screens.
+Multiple events in one year share a point. The popup separates observed annual CPI change from the event’s qualitative effect; it does not assign a causal percentage to the event.
+
+## Structure
+
+- `src/services/inflationApi.ts`: paginated World Bank fetch and validation.
+- `src/hooks/useInflationData.ts`: SWR refresh, cached error recovery, and range selection.
+- `src/components/Chart/`: chart options, banknote mask, and accessible event details.
+- `src/data/historicalEvents.ts`: event descriptions and primary-source links.
+- `src/styles/`: shared light-theme tokens and base styles.
+
+The app uses React, TypeScript, Vite, SWR, ApexCharts, and CSS Modules. No backend or credentials are required.
+
+## Banknote attribution
+
+`public/rupee-100.jpg` is the RBI ₹100 specimen image, published 19 July 2018, obtained from [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Rs_100_note_front_view.jpg).
+Provider: Reserve Bank of India. License: [Government Open Data License – India](https://data.gov.in/government-open-data-license-india).
+The original image is stored unmodified; the chart applies a display-only mask. RBI does not endorse this website.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
-
----
-
-<p align="center">
-  Made with love by <a href="https://thepushkarp.com">Pushkar Patel</a>
-</p>
+Application code: MIT. The banknote image has the separate attribution and license above.
