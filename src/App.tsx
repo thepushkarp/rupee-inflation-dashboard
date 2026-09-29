@@ -1,142 +1,110 @@
-import { useEffect, useMemo, useState } from 'react';
-import { mutate } from 'swr';
-
+import { useState } from 'react';
 import { InflationChart } from '@components/Chart';
-import { RangePresets, YearRangeSelector } from '@components/Controls';
-import { EventsLedger } from '@components/Events/EventsLedger';
-import { KpiStrip } from '@components/Kpi/KpiStrip';
-import { Footer } from '@components/Layout/Footer';
-import { TopBar } from '@components/Layout/TopBar';
+import { YearRangeSelector } from '@components/Controls';
 import { ErrorState, LoadingState } from '@components/ui';
 import { useInflationData } from '@hooks/useInflationData';
-import { useTheme } from '@hooks/useTheme';
-import { historicalEvents } from '@data/historicalEvents';
 import type { YearRange } from '@/types/inflation';
-
 import styles from './App.module.css';
 
 function App() {
-  const { theme, toggleTheme } = useTheme();
   const [selectedRange, setSelectedRange] = useState<YearRange | null>(null);
-  const [activeEventYear, setActiveEventYear] = useState<number | null>(null);
-  const {
-    data,
-    filteredData: chartData,
-    isLoading,
-    error,
-    yearRange: availableRange,
-    lastUpdated,
-  } = useInflationData(selectedRange ?? undefined);
-
-  const effectiveRange = useMemo(() => {
-    if (!availableRange) return null;
-    return selectedRange ?? { startYear: availableRange.min, endYear: availableRange.max };
-  }, [availableRange, selectedRange]);
-
-  const visibleEvents = useMemo(() => {
-    if (!effectiveRange) return [];
-    return historicalEvents.filter(
-      (event) => event.year >= effectiveRange.startYear && event.year <= effectiveRange.endYear
-    );
-  }, [effectiveRange]);
-
-  useEffect(() => {
-    if (!activeEventYear || !effectiveRange) return;
-    const inRange =
-      activeEventYear >= effectiveRange.startYear && activeEventYear <= effectiveRange.endYear;
-    if (!inRange) setActiveEventYear(null);
-  }, [activeEventYear, effectiveRange]);
-
-  const stats = useMemo(() => {
-    if (chartData.length === 0) return null;
-
-    const firstPoint = chartData.at(0);
-    const lastPoint = chartData.at(-1);
-    if (!firstPoint || !lastPoint) return null;
-
-    // Calculate value relative to the SELECTED start year, not 1960
-    // If ₹100 from startYear, what is it worth in endYear?
-    const relativeValue = (lastPoint.purchasingPower / firstPoint.purchasingPower) * 100;
-    const currentValue = Math.round(relativeValue * 100) / 100;
-    const percentLost = Math.round((100 - relativeValue) * 10) / 10;
-    const multiplier = currentValue === 0 ? 0 : Math.round((100 / currentValue) * 10) / 10;
-
-    return {
-      startYear: firstPoint.year,
-      endYear: lastPoint.year,
-      currentValue,
-      percentLost,
-      yearsSpan: lastPoint.year - firstPoint.year,
-      multiplier,
-    };
-  }, [chartData]);
+  const { data, filteredData, yearRange, effectiveRange, error, isLoading, isValidating, retry } =
+    useInflationData(selectedRange ?? undefined);
+  const checked = data
+    ? new Intl.DateTimeFormat(undefined, {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      }).format(data.fetchedAt)
+    : null;
 
   return (
     <div className={styles.app}>
-      <TopBar
-        theme={theme}
-        onToggleTheme={toggleTheme}
-        lastUpdated={lastUpdated}
-        {...(availableRange ? { dataThroughYear: availableRange.max } : {})}
-      />
-
-      <main className={styles.main}>
-        <div className={styles.shell}>
-          {isLoading ? <LoadingState /> : null}
-
-          {error ? (
-            <ErrorState error={error} onRetry={() => mutate('india-inflation-data')} />
-          ) : null}
-
-          {!isLoading && !error && data && effectiveRange && availableRange ? (
-            <>
-              {stats ? <KpiStrip stats={stats} /> : null}
-
-              <section className={styles.panel} aria-label="Inflation chart and historical context">
-                <div className={styles.chartColumn}>
-                  <InflationChart
-                    data={chartData}
-                    isDarkMode={theme === 'dark'}
-                    activeEventYear={activeEventYear}
-                  />
-
-                  <div className={styles.controlsRow}>
-                    <YearRangeSelector
-                      yearRange={effectiveRange}
-                      availableRange={availableRange}
-                      onChange={setSelectedRange}
-                    />
-                    <RangePresets
-                      availableRange={availableRange}
-                      activeRange={effectiveRange}
-                      onSelect={setSelectedRange}
-                    />
-                  </div>
-
-                  {stats ? (
-                    <p className={styles.summary}>
-                      From {stats.startYear} to {stats.endYear}, ₹100 becomes ₹
-                      {stats.currentValue.toFixed(2)} ({stats.percentLost.toFixed(1)}% loss).
-                    </p>
-                  ) : null}
-                </div>
-
-                <div className={styles.ledgerColumn}>
-                  <EventsLedger
-                    events={visibleEvents}
-                    activeYear={activeEventYear}
-                    onSelect={setActiveEventYear}
-                  />
-                </div>
-              </section>
-            </>
+      <header className={styles.header}>
+        <h1>Rupee Inflation</h1>
+        {yearRange ? <span>Annual CPI through {yearRange.max}</span> : null}
+      </header>
+      <main>
+        {!data && isLoading ? <LoadingState /> : null}
+        {!data && error ? <ErrorState error={error} onRetry={() => void retry()} /> : null}
+        {data && yearRange && effectiveRange ? (
+          <>
+            <div className={styles.controls}>
+              <YearRangeSelector
+                yearRange={effectiveRange}
+                availableRange={yearRange}
+                onChange={setSelectedRange}
+              />
+              <button className={styles.reset} type="button" onClick={() => setSelectedRange(null)}>
+                Full history
+              </button>
+            </div>
+            {error ? (
+              <p className={styles.notice} role="status">
+                Couldn’t refresh. Showing the last available data.{' '}
+                <button type="button" disabled={isValidating} onClick={() => void retry()}>
+                  Retry
+                </button>
+              </p>
+            ) : null}
+            {filteredData.length >= 2 ? (
+              <InflationChart data={filteredData} />
+            ) : (
+              <p className={styles.notice}>
+                No data for this range. Choose another period or reset to full history.
+              </p>
+            )}
+          </>
+        ) : null}
+      </main>
+      <footer className={styles.footer}>
+        <div className={styles.source}>
+          <a
+            href="https://data.worldbank.org/indicator/FP.CPI.TOTL?locations=IN"
+            target="_blank"
+            rel="noreferrer"
+          >
+            World Bank CPI
+          </a>
+          {checked ? (
+            <span
+              title={
+                data?.sourceUpdatedAt
+                  ? `World Bank dataset updated ${data.sourceUpdatedAt}`
+                  : undefined
+              }
+            >
+              Last checked <time dateTime={new Date(data!.fetchedAt).toISOString()}>{checked}</time>
+            </span>
           ) : null}
         </div>
-      </main>
-
-      <Footer />
+        <div className={styles.credits}>
+          <span>
+            Note:{' '}
+            <a
+              href="https://commons.wikimedia.org/wiki/File:Rs_100_note_front_view.jpg"
+              target="_blank"
+              rel="noreferrer"
+            >
+              RBI
+            </a>
+            ,{' '}
+            <a
+              href="https://data.gov.in/government-open-data-license-india"
+              target="_blank"
+              rel="noreferrer"
+            >
+              GODL India
+            </a>
+          </span>
+          <span>
+            Made by{' '}
+            <a href="https://www.thepushkarp.com/" target="_blank" rel="noreferrer">
+              Pushkar
+            </a>
+          </span>
+        </div>
+      </footer>
     </div>
   );
 }
-
 export default App;

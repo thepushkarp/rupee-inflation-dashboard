@@ -33,7 +33,7 @@ export function YearRangeSelector({ yearRange, availableRange, onChange }: YearR
   return (
     <div className={styles.container}>
       <label className={styles.label}>
-        From
+        ₹100 from
         <select
           className={styles.select}
           value={yearRange.startYear}
@@ -50,10 +50,8 @@ export function YearRangeSelector({ yearRange, availableRange, onChange }: YearR
         </select>
       </label>
 
-      <span className={styles.separator}>—</span>
-
       <label className={styles.label}>
-        To
+        to
         <select
           className={styles.select}
           value={yearRange.endYear}

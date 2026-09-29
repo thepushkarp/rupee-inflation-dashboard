@@ -1,12 +1,12 @@
 declare const styles: {
   readonly "app": string;
-  readonly "chartColumn": string;
-  readonly "controlsRow": string;
-  readonly "ledgerColumn": string;
-  readonly "main": string;
-  readonly "panel": string;
-  readonly "shell": string;
-  readonly "summary": string;
+  readonly "controls": string;
+  readonly "credits": string;
+  readonly "footer": string;
+  readonly "header": string;
+  readonly "notice": string;
+  readonly "reset": string;
+  readonly "source": string;
 };
 export = styles;
 

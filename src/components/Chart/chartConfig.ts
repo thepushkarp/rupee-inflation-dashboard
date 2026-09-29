@@ -1,235 +1,132 @@
 import type { ApexOptions } from 'apexcharts';
-import { findEventDataPoint } from '@data/historicalEvents';
 import type { HistoricalEvent, InflationDataPoint } from '@/types/inflation';
 
-interface AnnotationPoint {
-  x: string | number;
-  y: number;
-  marker?: {
-    size?: number;
-    fillColor?: string;
-    strokeColor?: string;
-    radius?: number;
-  };
-  label?: {
-    borderColor?: string;
-    offsetY?: number;
-    style?: {
-      color?: string;
-      background?: string;
-      fontSize?: string;
-      fontWeight?: number | string;
-      padding?: { left: number; right: number; top: number; bottom: number };
-    };
-    text?: string;
-  };
+const ACCENT = '#68518b';
+
+export function purchasingPower(data: InflationDataPoint[], point: InflationDataPoint): number {
+  return ((data[0]?.cpi ?? point.cpi) / point.cpi) * 100;
 }
 
-function createAnnotationPoint(
-  event: HistoricalEvent,
-  data: InflationDataPoint[],
-  baseValue: number,
-  isDarkMode: boolean,
-  isActive: boolean
-): AnnotationPoint | null {
-  const dataPoint = findEventDataPoint(data, event.year);
-  if (!dataPoint) return null;
-
-  const normalizedValue = (dataPoint.purchasingPower / baseValue) * 100;
-
-  const accent = isDarkMode ? '#38bdf8' : '#2563eb';
-  const danger = '#ef4444';
-
-  return {
-    x: String(event.year),
-    y: normalizedValue,
-    marker: {
-      size: isActive ? 7 : 5,
-      fillColor: isDarkMode ? '#0c111b' : '#ffffff',
-      strokeColor: isActive ? accent : accent,
-      radius: 2,
+export function createChartSeries(data: InflationDataPoint[]): NonNullable<ApexOptions['series']> {
+  return [
+    {
+      name: 'Purchasing power',
+      data: data.map((point) => ({ x: point.year, y: purchasingPower(data, point) })),
     },
-    label: {
-      borderColor: isActive ? accent : danger,
-      offsetY: event.offsetY ?? 0,
-      style: {
-        color: '#ffffff',
-        background: isActive ? accent : danger,
-        fontSize: '10px',
-        fontWeight: 500,
-        padding: { left: 6, right: 6, top: 3, bottom: 3 },
-      },
-      text: event.label,
-    },
-  };
+  ];
 }
 
 export function createChartOptions(
   data: InflationDataPoint[],
   events: HistoricalEvent[],
-  isDarkMode: boolean,
-  activeEventYear: number | null
+  onRendered: () => void
 ): ApexOptions {
-  const firstPoint = data.at(0);
-  if (!firstPoint) return {};
-
-  const baseValue = firstPoint.purchasingPower;
-  const textColor = isDarkMode ? '#a3a3a3' : '#525252';
-  const gridColor = isDarkMode ? '#262626' : '#e5e5e5';
-  const accent = isDarkMode ? '#38bdf8' : '#2563eb';
-
-  const visibleYears = new Set(data.map((d) => d.year));
-  const eventByYear = new Map(events.map((event) => [event.year, event] as const));
-  const annotations = events
-    .filter((e) => visibleYears.has(e.year))
-    .map((e) => createAnnotationPoint(e, data, baseValue, isDarkMode, e.year === activeEventYear))
-    .filter((a): a is NonNullable<typeof a> => a !== null);
-
-  // Calculate tick interval based on data length to avoid crowding
-  const tickInterval = data.length > 40 ? 5 : data.length > 20 ? 2 : 1;
-
+  const first = data.at(0);
+  const last = data.at(-1);
+  if (!first || !last) return {};
+  const years = new Set(events.map((event) => event.year));
+  const max = Math.max(100, ...data.map((point) => purchasingPower(data, point)));
   return {
     chart: {
       id: 'rupee-inflation-chart',
       type: 'area',
-      height: '100%',
       background: 'transparent',
       toolbar: { show: false },
       zoom: { enabled: false },
-      animations: {
-        enabled: true,
-        speed: 400,
-      },
-      fontFamily: 'DM Sans, sans-serif',
+      animations: { enabled: false },
+      fontFamily: 'Arial, Helvetica, sans-serif',
+      parentHeightOffset: 0,
+      events: { mounted: onRendered, updated: onRendered },
     },
-    colors: [accent],
-    fill: {
-      type: 'gradient',
-      gradient: {
-        shadeIntensity: 1,
-        opacityFrom: isDarkMode ? 0.22 : 0.25,
-        opacityTo: isDarkMode ? 0.05 : 0.02,
-        stops: [0, 100],
-      },
-    },
-    stroke: {
-      curve: 'smooth',
-      width: 2.5,
-    },
+    colors: [ACCENT],
+    fill: { type: 'solid', opacity: 0 },
+    stroke: { curve: 'straight', width: 2 },
     dataLabels: { enabled: false },
+    markers: { size: 0, hover: { sizeOffset: 0 } },
+    states: { hover: { filter: { type: 'none' } }, active: { filter: { type: 'none' } } },
     xaxis: {
-      categories: data.map((d) => String(d.year)),
-      type: 'category',
-      tickAmount: Math.ceil(data.length / tickInterval),
+      type: 'numeric',
+      min: first.year,
+      max: last.year,
+      tickAmount: Math.min(6, last.year - first.year),
+      decimalsInFloat: 0,
       labels: {
-        rotate: 0,
-        rotateAlways: false,
-        hideOverlappingLabels: true,
-        style: {
-          colors: textColor,
-          fontSize: '11px',
-          fontFamily: 'DM Sans, sans-serif',
-        },
+        formatter: (value) => String(Math.round(Number(value))),
+        style: { colors: '#706e76', fontSize: '13px' },
       },
-      axisBorder: { color: gridColor },
-      axisTicks: { color: gridColor },
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+      crosshairs: { show: false },
+      tooltip: { enabled: false },
     },
     yaxis: {
       min: 0,
-      max: 105,
+      max: Math.ceil(max / 25) * 25,
+      tickAmount: 4,
       labels: {
-        formatter: (value: number) => `₹${value.toFixed(0)}`,
-        style: {
-          colors: textColor,
-          fontSize: '11px',
-          fontFamily: 'DM Sans, sans-serif',
-        },
-        offsetX: -5,
+        formatter: (value) => '₹' + value.toFixed(0),
+        minWidth: 44,
+        style: { colors: '#706e76', fontSize: '13px' },
       },
     },
     grid: {
-      borderColor: gridColor,
-      strokeDashArray: 0,
+      borderColor: '#e9e7ed',
+      strokeDashArray: 3,
       xaxis: { lines: { show: false } },
       yaxis: { lines: { show: true } },
-      padding: { top: 0, right: 10, bottom: 0, left: 10 },
+      padding: { top: 20, right: 28, bottom: 0, left: 4 },
     },
-    annotations: { points: annotations },
+    annotations: {
+      points: [
+        ...data
+          .filter((point) => years.has(point.year))
+          .map((point) => ({
+            id: 'event-' + point.year,
+            x: point.year,
+            y: purchasingPower(data, point),
+            marker: { size: 4, fillColor: ACCENT, strokeColor: '#ffffff', strokeWidth: 1.5 },
+          })),
+        {
+          id: 'endpoint',
+          x: last.year,
+          y: purchasingPower(data, last),
+          marker: { size: 4, fillColor: ACCENT, strokeColor: '#ffffff', strokeWidth: 1.5 },
+          label: {
+            text: '₹' + purchasingPower(data, last).toFixed(2),
+            borderColor: 'transparent',
+            offsetY: -8,
+            offsetX: -16,
+            style: {
+              background: '#ffffff',
+              color: ACCENT,
+              fontSize: '14px',
+              fontWeight: 600,
+              padding: { left: 4, right: 4, top: 2, bottom: 2 },
+            },
+          },
+        },
+      ],
+    },
     tooltip: {
-      theme: isDarkMode ? 'dark' : 'light',
-      style: { fontFamily: 'DM Sans, sans-serif' },
-      custom: ({ series, seriesIndex, dataPointIndex }) => {
-        const point = data[dataPointIndex];
-        const year = point?.year;
-        const value = series[seriesIndex]?.[dataPointIndex];
-        const inflationRate = point?.inflationRate;
-        const event = year ? eventByYear.get(year) : undefined;
-
-        const background = isDarkMode ? '#0c111b' : '#ffffff';
-        const border = isDarkMode ? '#1b2638' : '#e5e5e5';
-        const fg = isDarkMode ? '#e6e9ef' : '#0b0f14';
-        const muted = isDarkMode ? '#a6adbb' : '#525252';
-
-        return `
-          <div style="
-            min-width: 180px;
-            padding: 10px 12px;
-            border: 1px solid ${border};
-            border-radius: 10px;
-            background: ${background};
-            color: ${fg};
-            box-shadow: 0 10px 30px rgba(0,0,0,0.18);
-            font-family: var(--font-sans);
-          ">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-              <div style="font-size:12px;font-weight:650;letter-spacing:-0.02em;">${year ?? ''}</div>
-              <div style="font-family: JetBrains Mono, monospace; font-size:12px; color:${muted};">CPI</div>
-            </div>
-            <div style="margin-top:8px;display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
-              <div style="font-size:12px;color:${muted};">Value of ₹100</div>
-              <div style="font-family: JetBrains Mono, monospace; font-size:14px; font-weight:650;">₹${typeof value === 'number' ? value.toFixed(2) : ''}</div>
-            </div>
-            <div style="margin-top:6px;display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
-              <div style="font-size:12px;color:${muted};">YoY inflation</div>
-              <div style="font-family: JetBrains Mono, monospace; font-size:12px; color:${muted};">${
-                typeof inflationRate === 'number' ? `${inflationRate.toFixed(2)}%` : '—'
-              }</div>
-            </div>
-            ${
-              event
-                ? `<div style="margin-top:10px;padding-top:8px;border-top:1px solid ${border};font-size:12px;color:${muted};">
-                     <span style="color:${fg};font-weight:600;">${event.label}</span>
-                   </div>`
-                : ''
-            }
-          </div>
-        `;
-      },
+      enabled: true,
+      intersect: false,
+      shared: false,
+      followCursor: true,
+      x: { formatter: (year) => String(Math.round(Number(year))) },
+      y: { formatter: (value) => '₹' + value.toFixed(2) },
+      marker: { show: false },
     },
     responsive: [
       {
-        breakpoint: 768,
+        breakpoint: 640,
         options: {
           xaxis: {
-            labels: { rotate: -90, style: { fontSize: '9px' } },
+            tickAmount: Math.min(3, last.year - first.year),
+            labels: { style: { fontSize: '11px' } },
           },
-          annotations: { points: [] },
+          grid: { padding: { right: 20, left: 0 } },
         },
       },
     ],
   };
-}
-
-export function createChartSeries(data: InflationDataPoint[]): NonNullable<ApexOptions['series']> {
-  const firstPoint = data.at(0);
-  if (!firstPoint) return [];
-
-  const baseValue = firstPoint.purchasingPower;
-
-  return [
-    {
-      name: 'Value',
-      data: data.map((d) => (d.purchasingPower / baseValue) * 100),
-    },
-  ];
 }
