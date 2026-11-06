@@ -113,7 +113,7 @@ export function createChartOptions(
       shared: false,
       followCursor: true,
       x: { formatter: (year) => String(Math.round(Number(year))) },
-      y: { formatter: (value) => '₹' + value.toFixed(2) },
+      y: { formatter: (value) => (value === null ? '' : '₹' + value.toFixed(2)) },
       marker: { show: false },
     },
     responsive: [
@@ -124,7 +124,7 @@ export function createChartOptions(
             tickAmount: Math.min(3, last.year - first.year),
             labels: { style: { fontSize: '11px' } },
           },
-          grid: { padding: { right: 20, left: 0 } },
+          grid: { padding: { right: 28, left: 4 } },
         },
       },
     ],
